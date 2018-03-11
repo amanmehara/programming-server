@@ -12,4 +12,5 @@ repositories {
 dependencies {
     compile 'io.vertx:vertx-core:3.5.1'
     compile 'io.vertx:vertx-web-client:3.5.1'
+    compile 'com.hazelcast:hazelcast:3.9.3'
 }
