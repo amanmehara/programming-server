@@ -37,8 +37,10 @@ public class Client {
         this.token = token;
     }
 
-    private CompletableFuture<HttpResponse<Buffer>> getResponse(String requestURI) {
-        CompletableFuture<HttpResponse<Buffer>> completableFuture = new CompletableFuture<>();
+    private CompletableFuture<HttpResponse<Buffer>> getResponse(
+            String requestURI) {
+        CompletableFuture<HttpResponse<Buffer>> completableFuture
+                = new CompletableFuture<>();
         WebClientOptions options = new WebClientOptions().setSsl(true);
         WebClient webClient = WebClient.create(vertx, options);
         webClient.get(port, host, requestURI)
