@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.amanmehara.programming.graph;
+package com.amanmehara.programming.tree;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -23,49 +23,23 @@ import java.util.Set;
 public class Node<T> {
 
     private final T data;
-    private Set<Edge> inEdges;
-    private Set<Edge> outEdges;
+    private Set<Node<T>> successors;
 
     public Node(T data) {
         this.data = data;
-        this.inEdges = new HashSet<>();
+        successors = new HashSet<>();
     }
 
-    public Node(T data, Set<Edge> inEdges) {
-        this.data = data;
-        this.inEdges = inEdges;
+    public Set<Node<T>> successors() {
+        return successors;
     }
 
-    public Set<Edge> inEdges() {
-        return inEdges;
+    public void successors(Set<Node<T>> successors) {
+        this.successors = successors;
     }
 
-    public void inEdges(Set<Edge> inEdges) {
-        this.inEdges = inEdges;
-    }
-
-    public Set<Edge> outEdges() {
-        return outEdges;
-    }
-
-    public void outEdges(Set<Edge> outEdges) {
-        this.outEdges = outEdges;
-    }
-
-    public void addInEdge(Edge edge) {
-        inEdges.add(edge);
-    }
-
-    public void removeInEdge(Edge edge) {
-        inEdges.remove(edge);
-    }
-
-    public void addOutEdge(Edge edge) {
-        outEdges.add(edge);
-    }
-
-    public void removeOutEdge(Edge edge) {
-        outEdges.remove(edge);
+    public void addSuccessor(Node<T> successor) {
+        successors.add(successor);
     }
 
     @Override
