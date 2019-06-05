@@ -30,6 +30,10 @@ public class Node<T> {
         successors = new HashSet<>();
     }
 
+    public T data() {
+        return data;
+    }
+
     public Set<Node<T>> successors() {
         return successors;
     }
