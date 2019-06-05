@@ -28,15 +28,19 @@ public class Tree<T> {
         this.root = root;
     }
 
-    private Node<T> root() {
+    public Node<T> root() {
         return root;
     }
 
-    public Node<T> transform(Node<T> node, UnaryOperator<Node<T>> operator) {
+    public Node<T> traverse(UnaryOperator<Node<T>> operator) {
+        return dfs(root, operator);
+    }
+
+    public Node<T> dfs(Node<T> node, UnaryOperator<Node<T>> operator) {
         node = operator.apply(node);
         Set<Node<T>> successors = node.successors()
                 .parallelStream()
-                .map(successor -> transform(successor, operator))
+                .map(successor -> dfs(successor, operator))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
         node.successors(successors);
