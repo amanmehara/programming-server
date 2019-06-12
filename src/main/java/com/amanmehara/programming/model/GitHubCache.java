@@ -16,8 +16,8 @@
 
 package com.amanmehara.programming.model;
 
-import com.amanmehara.programming.tree.Node;
-import com.amanmehara.programming.tree.Tree;
+import com.amanmehara.programming.graph.Node;
+import com.amanmehara.programming.graph.DirectedAcyclicGraph;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,17 +25,17 @@ import java.util.function.UnaryOperator;
 
 public class GitHubCache {
 
-    private final Tree<GitHubContent> tree;
+    private final DirectedAcyclicGraph<GitHubContent> dag;
     private final Map<String, Node<GitHubContent>> nodes;
 
-    private GitHubCache(Tree<GitHubContent> tree,
+    private GitHubCache(DirectedAcyclicGraph<GitHubContent> dag,
                         Map<String, Node<GitHubContent>> nodes) {
-        this.tree = tree;
+        this.dag = dag;
         this.nodes = nodes;
     }
 
-    public Tree<GitHubContent> tree() {
-        return tree;
+    public DirectedAcyclicGraph<GitHubContent> dag() {
+        return dag;
     }
 
     public Map<String, Node<GitHubContent>> nodes() {
@@ -44,11 +44,11 @@ public class GitHubCache {
 
     public static class GitHubCacheBuilder {
 
-        private Tree<GitHubContent> tree;
+        private DirectedAcyclicGraph<GitHubContent> dag;
         private Map<String, Node<GitHubContent>> nodes;
 
-        public GitHubCacheBuilder tree(Tree<GitHubContent> tree) {
-            this.tree = tree;
+        public GitHubCacheBuilder dag(DirectedAcyclicGraph<GitHubContent> dag) {
+            this.dag = dag;
             nodes();
             return this;
         }
@@ -59,11 +59,11 @@ public class GitHubCache {
                 nodes.put(node.data().sha(), node);
                 return node;
             };
-            tree.traverse(operator);
+            dag.traverse(operator);
         }
 
         public GitHubCache build() {
-            return new GitHubCache(tree, nodes);
+            return new GitHubCache(dag, nodes);
         }
     }
 }

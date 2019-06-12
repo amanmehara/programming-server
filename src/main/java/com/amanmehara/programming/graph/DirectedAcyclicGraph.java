@@ -14,32 +14,35 @@
  * limitations under the License.
  */
 
-package com.amanmehara.programming.tree;
+package com.amanmehara.programming.graph;
 
 import java.util.*;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
-public class Tree<T> {
+public class DirectedAcyclicGraph<T> {
 
-    private Node<T> root;
+    private Set<Node<T>> roots;
 
-    public Tree(Node<T> root) {
-        this.root = root;
+    public DirectedAcyclicGraph(Set<Node<T>> roots) {
+        this.roots = roots;
     }
 
-    public Node<T> root() {
-        return root;
+    public Set<Node<T>> roots() {
+        return roots;
     }
 
-    public Node<T> traverse(UnaryOperator<Node<T>> operator) {
-        return dfs(root, operator);
+    public Set<Node<T>> traverse(UnaryOperator<Node<T>> operator) {
+        return roots
+                .stream()
+                .map(root -> dfs(root, operator))
+                .collect(Collectors.toSet());
     }
 
     public Node<T> dfs(Node<T> node, UnaryOperator<Node<T>> operator) {
         node = operator.apply(node);
         Set<Node<T>> successors = node.successors()
-                .parallelStream()
+                .stream()
                 .map(successor -> dfs(successor, operator))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());

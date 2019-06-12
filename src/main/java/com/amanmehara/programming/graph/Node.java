@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.amanmehara.programming.tree;
+package com.amanmehara.programming.graph;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -42,7 +42,7 @@ public class Node<T> {
         this.successors = successors;
     }
 
-    public void addSuccessor(Node<T> successor) {
+    public void successor(Node<T> successor) {
         successors.add(successor);
     }
 
