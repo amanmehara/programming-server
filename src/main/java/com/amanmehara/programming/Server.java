@@ -15,5 +15,25 @@
  */
 package com.amanmehara.programming;
 
+import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpServer;
+import io.vertx.core.http.HttpServerResponse;
+
 public class Server {
+
+    public static void main(String[] args) {
+
+        Vertx vertx = Vertx.vertx();
+        HttpServer server = vertx.createHttpServer();
+
+        server.requestHandler(event -> {
+            HttpServerResponse response = event.response();
+            response.end();
+        });
+
+        server.listen(8080);
+
+
+    }
+
 }
