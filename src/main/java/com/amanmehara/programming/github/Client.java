@@ -28,10 +28,10 @@ public class Client {
 
     private final Vertx vertx;
     private final String host;
-    private final Integer port;
+    private final int port;
     private final String token;
 
-    public Client(Vertx vertx, String host, Integer port, String token) {
+    public Client(Vertx vertx, String host, int port, String token) {
         this.vertx = vertx;
         this.host = host;
         this.port = port;

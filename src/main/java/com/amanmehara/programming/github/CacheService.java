@@ -59,7 +59,6 @@ public class CacheService {
         var dag = new DirectedAcyclicGraph<>(roots);
 
         UnaryOperator<Node<GitHubContent>> operator = node -> {
-            System.out.println(node.data().name());
             var type = node.data().type();
             // TODO: Use requestURI instead of absoluteURI
             var url = node.data().url();
