@@ -8,6 +8,6 @@ repositories {
 }
 
 dependencies {
-    compile 'io.vertx:vertx-core:3.6.2'
-    compile 'io.vertx:vertx-web-client:3.6.2'
+    compile 'io.vertx:vertx-core:3.7.1'
+    compile 'io.vertx:vertx-web-client:3.7.1'
 }
