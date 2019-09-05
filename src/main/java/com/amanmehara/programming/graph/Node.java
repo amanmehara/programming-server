@@ -16,11 +16,12 @@
 
 package com.amanmehara.programming.graph;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class Node<T> {
+public class Node<T> implements Serializable {
 
     private final T data;
     private Set<Node<T>> successors;

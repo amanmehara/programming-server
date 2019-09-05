@@ -16,11 +16,12 @@
 
 package com.amanmehara.programming.graph;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
-public class DirectedAcyclicGraph<T> {
+public class DirectedAcyclicGraph<T> implements Serializable {
 
     private Set<Node<T>> roots;
 
