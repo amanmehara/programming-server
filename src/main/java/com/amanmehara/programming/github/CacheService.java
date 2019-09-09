@@ -60,7 +60,6 @@ public class CacheService {
 
         UnaryOperator<Node<GitHubContent>> operator = node -> {
             var type = node.data().type();
-            // TODO: Use requestURI instead of absoluteURI
             var url = node.data().url();
             switch (type) {
                 case "file":
