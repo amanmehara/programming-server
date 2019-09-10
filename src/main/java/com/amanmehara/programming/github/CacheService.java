@@ -25,6 +25,7 @@ import io.vertx.core.json.Json;
 
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
@@ -32,30 +33,37 @@ public class CacheService {
 
     private final Client client;
     private final String contentURI;
+    private final Executor executor;
 
-    public CacheService(Client client, String contentURI) {
+    public CacheService(Client client, String contentURI, Executor executor) {
         this.client = client;
         this.contentURI = contentURI;
+        this.executor = executor;
     }
 
     private CompletableFuture<GitHubContent> getSuccessor(
             String requestURI) {
-        return client.getResponse(requestURI).thenApply(response ->
-                Json.decodeValue(response.body(), new TypeReference<>() {
-                }));
+        return client
+                .getResponse(requestURI)
+                .thenApplyAsync(response ->
+                        Json.decodeValue(response.body(), new TypeReference<>() {
+                        }), executor);
     }
 
     private CompletableFuture<Set<GitHubContent>> getSuccessors(
             String requestURI) {
-        return client.getResponse(requestURI).thenApply(response ->
-                Json.decodeValue(response.body(), new TypeReference<>() {
-                }));
+        return client
+                .getResponse(requestURI)
+                .thenApplyAsync(response ->
+                        Json.decodeValue(response.body(), new TypeReference<>() {
+                        }), executor);
     }
 
     public GitHubCache buildCache() {
 
-        var roots = getSuccessors(contentURI).thenApply(gitHubContents ->
-                gitHubContents.stream().map(Node::new).collect(Collectors.toSet())).join();
+        var roots = getSuccessors(contentURI)
+                .thenApplyAsync(gitHubContents -> gitHubContents.parallelStream().map(Node::new).collect(Collectors.toSet()), executor)
+                .join();
         var dag = new DirectedAcyclicGraph<>(roots);
 
         UnaryOperator<Node<GitHubContent>> operator = node -> {
@@ -63,14 +71,15 @@ public class CacheService {
             var url = node.data().url();
             switch (type) {
                 case "file":
-                    var successor = getSuccessor(url).thenApply(Node::new).join();
+                    var successor = getSuccessor(url).thenApplyAsync(Node::new, executor).join();
                     if (!node.equals(successor)) {
                         node.successor(successor);
                     }
                     break;
                 case "dir":
-                    var successors = getSuccessors(url).thenApply(gitHubContents ->
-                            gitHubContents.stream().map(Node::new).collect(Collectors.toSet())).join();
+                    var successors = getSuccessors(url)
+                            .thenApplyAsync(gitHubContents -> gitHubContents.parallelStream().map(Node::new).collect(Collectors.toSet()), executor)
+                            .join();
                     node.successors(successors);
                     break;
                 default:

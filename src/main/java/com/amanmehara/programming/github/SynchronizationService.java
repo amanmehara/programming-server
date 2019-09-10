@@ -25,15 +25,18 @@ import io.vertx.core.json.Json;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class SynchronizationService {
 
     private final Client client;
+    private final Executor executor;
 
-    SynchronizationService(Client client) {
+    public SynchronizationService(Client client, Executor executor) {
         this.client = client;
+        this.executor = executor;
     }
 
     public GitHubCache synchronize(GitHubCache cache) {
@@ -59,16 +62,20 @@ public class SynchronizationService {
 
     private CompletableFuture<GitHubContent> getSuccessor(
             String requestURI) {
-        return client.getResponse(requestURI).thenApply(response ->
-                Json.decodeValue(response.body(), new TypeReference<>() {
-                }));
+        return client
+                .getResponse(requestURI)
+                .thenApplyAsync(response ->
+                        Json.decodeValue(response.body(), new TypeReference<>() {
+                        }), executor);
     }
 
     private CompletableFuture<Set<GitHubContent>> getSuccessors(
             String requestURI) {
-        return client.getResponse(requestURI).thenApply(response ->
-                Json.decodeValue(response.body(), new TypeReference<>() {
-                }));
+        return client
+                .getResponse(requestURI)
+                .thenApplyAsync(response ->
+                        Json.decodeValue(response.body(), new TypeReference<>() {
+                        }), executor);
     }
 
     private Set<Node<GitHubContent>> getSuccessors(Node<GitHubContent> node) {
@@ -76,14 +83,15 @@ public class SynchronizationService {
         var url = node.data().url();
         switch (type) {
             case "file":
-                return Optional.of(getSuccessor(url).thenApply(Node::new))
+                return Optional.of(getSuccessor(url)
+                        .thenApplyAsync(Node::new, executor))
                         .map(CompletableFuture::join)
                         .filter(Predicate.not(node::equals))
                         .stream()
                         .collect(Collectors.toSet());
             case "dir":
                 return getSuccessors(url)
-                        .thenApply(gitHubContents -> gitHubContents.stream().map(Node::new).collect(Collectors.toSet()))
+                        .thenApplyAsync(gitHubContents -> gitHubContents.parallelStream().map(Node::new).collect(Collectors.toSet()), executor)
                         .join();
             default:
                 return Collections.emptySet();
