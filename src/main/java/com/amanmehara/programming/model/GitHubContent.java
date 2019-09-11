@@ -20,10 +20,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class GitHubContent {
+public class GitHubContent implements Serializable {
 
     private String name;
     private String path;
@@ -99,12 +100,19 @@ public class GitHubContent {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         GitHubContent that = (GitHubContent) o;
-        return sha.equals(that.sha);
+        return Objects.equals(name, that.name)
+                && Objects.equals(path, that.path)
+                && Objects.equals(sha, that.sha)
+                && Objects.equals(size, that.size)
+                && Objects.equals(url, that.url)
+                && Objects.equals(type, that.type)
+                && Objects.equals(content, that.content)
+                && Objects.equals(encoding, that.encoding);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sha);
+        return Objects.hash(name, path, sha, size, url, type, content, encoding);
     }
 
 }

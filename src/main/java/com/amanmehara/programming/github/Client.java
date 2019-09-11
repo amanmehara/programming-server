@@ -24,20 +24,19 @@ import io.vertx.ext.web.client.WebClientOptions;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.logging.Logger;
 
 public class Client {
 
+    private static final Logger LOGGER = Logger.getLogger(Client.class.getName());
+
     private final Vertx vertx;
     private final Executor executor;
-    private final String host;
-    private final int port;
     private final String token;
 
-    public Client(Vertx vertx, Executor executor, String host, int port, String token) {
+    public Client(Vertx vertx, Executor executor, String token) {
         this.vertx = vertx;
         this.executor = executor;
-        this.host = host;
-        this.port = port;
         this.token = token;
     }
 
@@ -46,7 +45,7 @@ public class Client {
         var completableFuture = new CompletableFuture<HttpResponse<Buffer>>();
         var options = new WebClientOptions().setSsl(true);
         var webClient = WebClient.create(vertx, options);
-        webClient.get(port, host, requestURI)
+        webClient.getAbs(requestURI)
                 .putHeader("Authorization", String.format("token %s", token))
                 .send(event -> {
                     if (event.succeeded()) {

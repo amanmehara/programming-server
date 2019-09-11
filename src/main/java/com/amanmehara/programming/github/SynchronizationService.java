@@ -23,13 +23,19 @@ import com.amanmehara.programming.model.GitHubContent;
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.vertx.core.json.Json;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Predicate;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class SynchronizationService {
+
+    private static final Logger LOGGER = Logger.getLogger(SynchronizationService.class.getName());
 
     private final Client client;
     private final Executor executor;
@@ -48,13 +54,13 @@ public class SynchronizationService {
     }
 
     private Node<GitHubContent> synchronize(Node<GitHubContent> node,
-                                            Map<String, Node<GitHubContent>> shaNodeMapping) {
-        var sha = node.data().sha();
-        if (shaNodeMapping.containsKey(sha)) {
-            return shaNodeMapping.get(sha);
+                                            Map<Integer, Node<GitHubContent>> hashNodeMapping) {
+        var hashCode = node.hashCode();
+        if (hashNodeMapping.containsKey(hashCode)) {
+            return hashNodeMapping.get(hashCode);
         }
         var successors = getSuccessors(node).stream()
-                .map(successor -> synchronize(successor, shaNodeMapping))
+                .map(successor -> synchronize(successor, hashNodeMapping))
                 .collect(Collectors.toSet());
         node.successors(successors);
         return node;

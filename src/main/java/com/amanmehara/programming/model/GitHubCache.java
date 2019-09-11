@@ -26,10 +26,10 @@ import java.util.function.UnaryOperator;
 public class GitHubCache {
 
     private final DirectedAcyclicGraph<GitHubContent> dag;
-    private final Map<String, Node<GitHubContent>> nodes;
+    private final Map<Integer, Node<GitHubContent>> nodes;
 
     private GitHubCache(DirectedAcyclicGraph<GitHubContent> dag,
-                        Map<String, Node<GitHubContent>> nodes) {
+                        Map<Integer, Node<GitHubContent>> nodes) {
         this.dag = dag;
         this.nodes = nodes;
     }
@@ -38,14 +38,14 @@ public class GitHubCache {
         return dag;
     }
 
-    public Map<String, Node<GitHubContent>> nodes() {
+    public Map<Integer, Node<GitHubContent>> nodes() {
         return nodes;
     }
 
     public static class GitHubCacheBuilder {
 
         private DirectedAcyclicGraph<GitHubContent> dag;
-        private Map<String, Node<GitHubContent>> nodes;
+        private Map<Integer, Node<GitHubContent>> nodes;
 
         public GitHubCacheBuilder dag(DirectedAcyclicGraph<GitHubContent> dag) {
             this.dag = dag;
@@ -56,7 +56,7 @@ public class GitHubCache {
         private void nodes() {
             nodes = new HashMap<>();
             UnaryOperator<Node<GitHubContent>> operator = node -> {
-                nodes.put(node.data().sha(), node);
+                nodes.put(node.hashCode(), node);
                 return node;
             };
             dag.traverse(operator);

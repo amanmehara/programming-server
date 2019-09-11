@@ -16,10 +16,10 @@
 
 package com.amanmehara.programming.github;
 
+import com.amanmehara.programming.graph.DirectedAcyclicGraph;
 import com.amanmehara.programming.graph.Node;
 import com.amanmehara.programming.model.GitHubCache;
 import com.amanmehara.programming.model.GitHubContent;
-import com.amanmehara.programming.graph.DirectedAcyclicGraph;
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.vertx.core.json.Json;
 
@@ -27,18 +27,22 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.UnaryOperator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class CacheService {
 
-    private final Client client;
-    private final String contentURI;
-    private final Executor executor;
+    private static final Logger LOGGER = Logger.getLogger(CacheService.class.getName());
 
-    public CacheService(Client client, String contentURI, Executor executor) {
+    private final Client client;
+    private final Executor executor;
+    private final String contentURI;
+
+    public CacheService(Client client, Executor executor, String contentURI) {
         this.client = client;
-        this.contentURI = contentURI;
         this.executor = executor;
+        this.contentURI = contentURI;
     }
 
     private CompletableFuture<GitHubContent> getSuccessor(
@@ -60,6 +64,8 @@ public class CacheService {
     }
 
     public GitHubCache buildCache() {
+
+        LOGGER.log(Level.INFO, "Build DAG ~#@ Begin");
 
         var roots = getSuccessors(contentURI)
                 .thenApplyAsync(gitHubContents -> gitHubContents.parallelStream().map(Node::new).collect(Collectors.toSet()), executor)
@@ -89,6 +95,8 @@ public class CacheService {
         };
 
         dag.traverse(operator);
+
+        LOGGER.log(Level.INFO, "Build DAG ~#@ End");
 
         return new GitHubCache.GitHubCacheBuilder().dag(dag).build();
 
